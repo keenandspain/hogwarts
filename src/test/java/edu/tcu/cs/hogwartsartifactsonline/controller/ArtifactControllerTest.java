@@ -1,7 +1,7 @@
 package edu.tcu.cs.hogwartsartifactsonline.controller;
-
 import edu.tcu.cs.hogwartsartifactsonline.domain.Artifact;
 import edu.tcu.cs.hogwartsartifactsonline.service.ArtifactService;
+import javafx.beans.value.ObservableBooleanValue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,14 +10,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import javax.print.attribute.standard.Media;
 import java.util.ArrayList;
 import java.util.List;
-
 import static javafx.beans.binding.Bindings.when;
 import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
 class ArtifactControllerTest {
     @Mock
@@ -25,40 +26,61 @@ class ArtifactControllerTest {
     @InjectMocks
     ArtifactController controller;
     List<Artifact> list;
+    MockMvc mockMvc;
     @BeforeEach
     void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         Artifact a1 = new Artifact();
         a1.setId("1250808601736515584");
         a1.setName("Deluminator");
-        a1.setDescription("LONG DESCRIPTION");
+        a1.setDescription("A Deluminator is a device invented by Albus...");
         a1.setImageUrl("imageUrl");
-
+        Artifact a2 = new Artifact();
+        a1.setId("1250808601744904193");
+        a1.setName("Invisibility Cloak");
+        a1.setDescription("An invisibility cloak is used to make the wearer invisible.");
+        a1.setImageUrl("imageUrl");
         list = new ArrayList<>();
         list.add(a1);
+        list.add(a2);
     }
-
     @AfterEach
     void tearDown() {
     }
-
     @Test
-    void findAll() {
-
+    void findAll() throws Exception {
+        when((ObservableBooleanValue) artifactService.findAll()).thenReturn(list);
+        mockMvc.perform(MockMvcRequestBuilders.get("/artifacts").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data",hasSize(2)))
+                .andExpect(jsonPath("$.data[0].id").value(("1250808601736515584"))).andExpect(jsonPath("$.data[0].name").value("Deluminator"))
+                .andExpect(jsonPath("$.data[1].id").value(("1250808601744904193"))
+                        .andExpect(jsonPath("$.data[1].name").value("Invisibility Cloak"));
     }
-
     @Test
     void findById() {
     }
-
     @Test
     void save() {
     }
-
     @Test
     void update() {
     }
-
     @Test
     void delete() {
+    }
+    @Test
+    void testFindAll() {
+    }
+    @Test
+    void testFindById() {
+    }
+    @Test
+    void testSave() {
+    }
+    @Test
+    void testUpdate() {
+    }
+    @Test
+    void testDelete() {
     }
 }
